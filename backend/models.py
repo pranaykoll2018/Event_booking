@@ -78,8 +78,10 @@ class TimeSlot(db.Model):
             "id":            self.id,
             "title":         self.title,
             "category":      self.category,
-            "start_time":    self.start_time.isoformat(),
-            "end_time":      self.end_time.isoformat(),
+            # Append Z so Angular's date pipe treats these as UTC
+            # and does not shift them into the browser's local timezone.
+            "start_time":    self.start_time.isoformat() + "Z",
+            "end_time":      self.end_time.isoformat() + "Z",
             # Total number of users subscribed to this slot
             "booking_count": len(self.bookings),
             # True only if the requesting user has booked this slot
