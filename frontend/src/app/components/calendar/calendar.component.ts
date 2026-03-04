@@ -251,7 +251,7 @@ export class CalendarComponent implements OnInit {
     // Compare using UTC date parts — the backend stores times without timezone,
     // so we must not let the browser shift them into local time for comparison.
     return this.filteredSlots.filter(s => {
-      const slotDate = new Date(s.start_time + 'Z');  // treat stored time as UTC
+      const slotDate = new Date(s.start_time);  // already has Z suffix from backend
       return (
         slotDate.getUTCFullYear() === day.getFullYear() &&
         slotDate.getUTCMonth()    === day.getMonth()    &&
