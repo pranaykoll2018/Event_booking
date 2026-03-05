@@ -71,7 +71,7 @@ import { TimeSlot } from '../../models/models';
             <mat-form-field appearance="outline" class="field-date">
               <mat-label>Date</mat-label>
               <!-- readonly prevents manual text entry; the picker is the only input -->
-              <input matInput [matDatepicker]="picker" [(ngModel)]="form.date" readonly />
+              <input matInput [matDatepicker]="picker" [(ngModel)]="form.date" [min]="today" readonly />
               <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
               <mat-datepicker #picker></mat-datepicker>
             </mat-form-field>
@@ -219,6 +219,7 @@ import { TimeSlot } from '../../models/models';
 })
 export class AdminComponent implements OnInit {
   categories = ['Cat 1', 'Cat 2', 'Cat 3'];
+  today = new Date();  // used as [min] on datepicker to block past dates
   columns    = ['title', 'category', 'start', 'end', 'subscribers', 'actions'];
   slots: TimeSlot[] = [];
 

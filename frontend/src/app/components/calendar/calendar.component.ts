@@ -42,7 +42,7 @@ const DAY_LABELS     = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
       <!-- Week navigation — shifts the displayed week by 7 days -->
       <div class="week-nav">
-        <button mat-icon-button (click)="changeWeek(-1)">
+        <button mat-icon-button (click)="changeWeek(-1)" [disabled]="isCurrentWeek">
           <mat-icon>chevron_left</mat-icon>
         </button>
         <span class="week-label">{{ weekLabel }}</span>
@@ -219,8 +219,15 @@ export class CalendarComponent implements OnInit {
     return `${fmt(this.weekStart)} – ${fmt(end)} ${end.getFullYear()}`;
   }
 
+  /** Whether the displayed week is the current week (back button disabled). */
+  get isCurrentWeek(): boolean {
+    const thisMonday = this.getMonday(new Date());
+    return this.weekStart.toDateString() === thisMonday.toDateString();
+  }
+
   /** Navigate to the previous or next week (dir: -1 or +1). */
   changeWeek(dir: number) {
+    if (dir === -1 && this.isCurrentWeek) return;  // don't go to past weeks
     const next = new Date(this.weekStart);
     next.setDate(next.getDate() + dir * 7);
     this.setWeek(next);
@@ -248,10 +255,12 @@ export class CalendarComponent implements OnInit {
 
   /** Return only the slots whose start_time falls on the given day. */
   slotsForDay(day: Date): TimeSlot[] {
-    // Compare using UTC date parts — the backend stores times without timezone,
-    // so we must not let the browser shift them into local time for comparison.
+    const now = new Date();
     return this.filteredSlots.filter(s => {
       const slotDate = new Date(s.start_time);  // already has Z suffix from backend
+      // Only show slots that haven't ended yet
+      const slotEnd = new Date(s.end_time);
+      if (slotEnd < now) return false;
       return (
         slotDate.getUTCFullYear() === day.getFullYear() &&
         slotDate.getUTCMonth()    === day.getMonth()    &&
